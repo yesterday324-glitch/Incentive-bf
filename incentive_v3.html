@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>지역별 인센티브 혜택 대시보드</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<style>
+:root{--f:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:#f5f3ff;padding:14px;color:#111827}
+.hdr{text-align:center;font-size:21px;font-weight:700;color:#5b21b6;margin-bottom:7px;letter-spacing:-.3px}
+.hdr-desc{text-align:center;font-size:13px;font-weight:500;color:#6b7280;line-height:1.7;margin:0 auto 14px;max-width:780px;background:#fff;border:1px solid #e9e3fb;border-radius:10px;padding:10px 18px}
+.hdr-desc b{color:#6d28d9;font-weight:700}
+.hdr-desc .div{margin:0 7px;color:#d1c7ef}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
+.cat-btn{padding:7px 15px;border-radius:20px;border:2px solid #d1d5db;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.cat-btn.active{background:#5b21b6;color:#fff;border-color:#5b21b6}
+.cat-btn:hover:not(.active){border-color:#7c3aed;color:#5b21b6}
+.sub-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px;min-height:36px}
+.sub-btn{padding:6px 14px;border-radius:16px;border:2px solid;background:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:.15s}
+.sub-btn.purple{border-color:#7c3aed;color:#5b21b6}
+.sub-btn.red{border-color:#dc2626;color:#b91c1c}
+.sub-btn.teal{border-color:#0d9488;color:#0f766e}
+.sub-btn.blue{border-color:#2563eb;color:#1d4ed8}
+.sub-btn.orange{border-color:#ea580c;color:#c2410c}
+.sub-btn.navy{border-color:#1e40af;color:#1e3a8a}
+.sub-btn.active.purple,.sub-btn.purple:hover{background:#7c3aed;color:#fff}
+.sub-btn.active.red,.sub-btn.red:hover{background:#dc2626;color:#fff}
+.sub-btn.active.teal,.sub-btn.teal:hover{background:#0d9488;color:#fff}
+.sub-btn.active.blue,.sub-btn.blue:hover{background:#2563eb;color:#fff}
+.sub-btn.active.orange,.sub-btn.orange:hover{background:#ea580c;color:#fff}
+.sub-btn.active.navy,.sub-btn.navy:hover{background:#1e3a8a;color:#fff}
+.panel{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden;display:none}
+.panel.show{display:block}
+.p-title{padding:12px 16px;font-size:16px;font-weight:700;color:#fff}
+.p-title.purple{background:#5b21b6}.p-title.red{background:#b91c1c}.p-title.teal{background:#0f766e}
+.p-title.blue{background:#1d4ed8}.p-title.orange{background:#c2410c}.p-title.navy{background:#1e3a8a}
+.s-hdr{padding:8px 16px;font-size:13px;font-weight:600;color:#fff}
+.s-hdr.purple{background:#7c3aed}.s-hdr.red{background:#dc2626}.s-hdr.teal{background:#0d9488}
+.s-hdr.blue{background:#2563eb}.s-hdr.orange{background:#ea580c}.s-hdr.navy{background:#1e40af}
+table{width:100%;border-collapse:collapse}
+th{padding:8px 11px;font-size:12px;font-weight:600;text-align:left;background:#f3f4f6;border-bottom:2px solid #e5e7eb;color:#374151}
+td{padding:8px 11px;font-size:13px;border-bottom:1px solid #f3f4f6;vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.b0{background:#f3f4f6;color:#6b7280}.b1{background:#ede9fe;color:#6d28d9}.b2{background:#dcfce7;color:#15803d}
+.b3{background:#fef3c7;color:#d97706}.b4{background:#fce7f3;color:#be185d}
+.b5{background:#dbeafe;color:#1e40af}.b6{background:#fef9c3;color:#713f12}
+.ctd{font-size:11px;color:#6b7280}
+.sub-hdr-row{background:#f3f0ff;color:#5b21b6;font-weight:700;font-size:13px;padding:8px 12px;border-top:2px solid #7c3aed;border-bottom:1px solid #ddd6fe;letter-spacing:0.02em}
+.promo-box{margin:14px 16px 2px;border:2px solid #f0b860;border-radius:12px;overflow:hidden}
+.promo-hd{background:#d97706;color:#fff;padding:11px 16px;font-size:14px;font-weight:700;line-height:1.35}
+.promo-hd .sub{display:block;font-size:11.5px;font-weight:500;opacity:.93;margin-top:2px}
+.promo-bd{background:#fffdf5;padding:12px 14px}
+.promo-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+.promo-chips .pc{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:8px;padding:4px 9px;font-size:11px;font-weight:600}
+.promo-tb{width:100%;border-collapse:collapse;background:#fff}
+.promo-tb td{padding:8px 12px;font-size:13px;border-bottom:1px solid #f1e6c9}
+.promo-tb tr:last-child td{border-bottom:none}
+.promo-tb .qt{font-weight:600;color:#374151}
+.promo-tb .amt{text-align:right;font-weight:700;color:#b45309;white-space:nowrap}
+.promo-note{margin-top:9px;font-size:11px;color:#92400e;font-weight:500}
+</style>
+</head>
+<body>
+<div class="hdr">🗺️ 지역별 인센티브 혜택 대시보드</div>
+<div class="hdr-desc">
+기업 포상여행 · 임직원 워크숍 · 우수고객 초청 · 동호회 단합여행 등 <b>단독 단체 고객</b>을 위한 지역별 맞춤 혜택을 한곳에 모았습니다.<br>
+아래에서 <b>지역</b><span class="div">▸</span><b>출발지</b>를 차례로 선택하면 인원 · 조건별 제공 혜택을 바로 확인할 수 있습니다.
+</div>
+<div class="cat-tabs" id="ct"></div>
+<div class="sub-grid" id="sg"></div>
+<div class="panel" id="dp"></div>
+<script>
+const cats=[
+  {id:'동남아',lb:'🌏 동남아/대만',subs:['베트남','태국','싱가포르','말레이시아','캄보디아','필리핀','대만','발리','라오스']},
+  {id:'일본',lb:'🗾 일본',subs:['일본(인천/청주)','일본(김해/대구/제주)']},
+  {id:'중국',lb:'🇨🇳 중국/몽골',subs:['중국(인천/청주)','중국(지방출발)','몽골','중앙아시아','홍콩마카오']},
+  {id:'괌',lb:'🏝️ 괌/사이판/호주',subs:['괌','사이판','호주/뉴질랜드']},
+  {id:'유럽',lb:'✈️ 유럽/중동/미주',subs:['유럽/중동','미주','하와이']},
+  {id:'크루즈',lb:'🚢 크루즈',subs:['지중해/북유럽','알래스카','C싱가포르','C상해','C아시아','C일본']},
+];
+const lbs={'홍콩마카오':'홍콩/마카오','C싱가포르':'싱가포르','C상해':'상해','C아시아':'아시아','C일본':'일본(부산항)'};
+const bcM={basic:'b0',general:'b1',golf:'b2',special:'b3',summer:'b4',common:'b5',random:'b6'};
+const D={
+'베트남':{c:'purple',
+box:[{t:'🎫 단체 상품권 프로모션',sub:'나트랑 · 하노이 · 사파 · 하롱베이 단체 대상',chips:['📅 출발기간 : 2026년 2분기','🗓️ 시행기간 : 2026.1.27 부터','⚠️ 기 모객 제외 · 지역 프로모션 중복 적용','📌 요청 시에만 지급'],rows:[['20 ~ 39명 단체','5만원권'],['40 ~ 59명 단체','10만원권'],['60 ~ 79명 단체','15만원권'],['80명 이상 단체','20만원권']],note:'26년 2분기 출발 단체 한정 · 단체당 1회 증정'}],
+s:[
+  {t:'✈️ 인천 / 청주 출발 · 베트남 전 지역',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍗 치킨 1마리 + 🍺 맥주 2병 (객실당)<br>💧 매일 생수 1개',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🏖️ 다낭 / 푸꾸옥',r:[
+    {cat:'추가혜택',cs:'special',p:'-',b:'🍱 과일도시락 1개 (인당)',d:'동남아상품팀 담당 단체'},
+    {cat:'⛳골프',cs:'golf',p:'8명 이상',b:'🧺 스낵바구니 (객실당)<br>▸ 16명 이상 : 현수막 증정 (인쇄파일 별도 필요)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해 / 대구 / 제주 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍗 치킨맥 치킨 1마리 + 🍺 맥주 1캔 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'태국':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'방콕',cs:'general',p:'20명 이상',b:'🍽️ 식사 시 🍺 맥주 또는 🥤 음료 1인 1병 1회<br>🍽️ 석식 한식 시 🎤 노래방기기 / 🚪 단독룸 1회',d:'동남아상품팀 담당 단체'},
+    {cat:'치앙마이/푸켓',cs:'general',p:'15명 이상',b:'🍽️ 식사 시 🍺 맥주 또는 🥤 음료 1병 (1회)',d:'동남아상품팀 담당 단체'},
+    {cat:'⛳방콕/파타야',cs:'golf',p:'⛳ 12명 이상',b:'💆 전신마사지 2시간 1회',d:'골프/크루즈상품팀 (골프텔 제외)'},
+    {cat:'⛳치앙마이',cs:'golf',p:'⛳ 10명 이상',b:'🍱 라운드 시 간식박스 (객실당)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'방콕/파타야',cs:'general',p:'20명 이상',b:'🍽️ 석식 한식 시 🚪 단독룸 1회',d:'지방출발상품팀 담당 단체'},
+    {cat:'치앙마이',cs:'general',p:'16명 이상',b:'🍽️ 석식 한식 시 🚪 단독룸 1회 + 🍺 맥주 인당 1병',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'싱가포르':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'15명 이상',b:'🍞 카야토스트 1개',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍞 카야토스트 1개<br>☕ 커피 또는 티 1잔',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'말레이시아':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'코타키나발루',cs:'general',p:'10명 이상',b:'🍖 한식 업그레이드 1회 (🎤 노래방기기 + 🍲 무제한 삼겹살)<br>💧 매일 생수 1개',d:'동남아상품팀 담당 단체'},
+    {cat:'⛳코타키나발루',cs:'golf',p:'⛳ 10명 이상',b:'⛳ 골프공 3구 (인당)',d:'골프/크루즈상품팀 담당 단체'},
+    {cat:'쿠알라룸푸르',cs:'general',p:'15명 이상',b:'🍖 한식 업그레이드 1회 (🦆 훈제오리 + 장어 1회)<br>💧 매일 생수 1개',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'코타키나발루',cs:'general',p:'10명 이상',b:'🧺 스낵바구니 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'캄보디아':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍗 치킨 1마리 + 🍺 맥주 2병 (객실당)<br>💧 매일 생수 1개',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍗 치킨팩 치킨 1마리 + 🍺 맥주 1캔 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'필리핀':{c:'purple',s:[
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'마닐라/보홀',cs:'general',p:'최소 4명 부터',b:'🧺 스낵바구니 & 🍺 맥주 2캔 (객실당)',d:'지방출발상품팀 담당 단체'},
+    {cat:'세부',cs:'general',p:'10명 이상 단체',b:'🧺 스낵바구니 & 🍺 맥주 2캔 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'대만':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍍 펑리수 1상자 (객실당)',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍍 펑리수 1상자 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'발리':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'15명 이상',b:'🧺 스낵바구니 (객실당)<br>🧴 핸드크림 (인당)<br>💧 매일 생수 1개',d:'동남아상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🧺 스낵바구니 (객실당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'라오스':{c:'purple',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍺 매일 석식 라오스 맥주 1병',d:'동남아상품팀 담당 단체'},
+    {cat:'⛳골프',cs:'golf',p:'⛳ 12명 이상',b:'💆 전신마사지 1시간 1회<br>🍺 첫날 석식 시 라오맥주 2병',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'전 지역',cs:'general',p:'15명 이상 단체',b:'🍺 매 석식마다 맥주 1병 (인당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'일본(인천/청주)':{c:'red',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'20명 이상',b:'🍡 화과자 1세트 (객실당) 또는 💧 매일 생수 1병 중 1개 혜택<br>[20명~] 🚌 패키지 동일요금/행사 차량 1대<br>[50명~] 🚌 패키지 동일요금/행사 차량 2대',d:'일본상품팀 담당 단체<br>패키지동일요금 할인 프로모션 상품요금 제외<br>패키지 동일 일정에 한 함'},
+  ]},
+  {t:'🏬 도쿄/규슈 추가혜택',r:[
+    {cat:'추가혜택',cs:'special',p:'20명 이상',b:'💧 매일 생수 1병 (화과자 변경 불가)<br>🍺 석식 1회 니나비루 1잔 (생맥주)<br><br>🎫 백화점 상품권 단체당 증정:<br>&nbsp;• 5만원권 (20~39명 단체)<br>&nbsp;• 10만원권 (40~59명 단체)<br>&nbsp;• 15만원권 (60~79명 단체)<br>&nbsp;• 20만원권 (80명 이상 단체)',d:'일본상품팀 담당 단체'},
+  ]},
+  {t:'☀️ 도쿄/규슈 하계 추가혜택',r:[
+    {cat:'하계특별',cs:'summer',p:'최소 10명~',b:'2026. 07 ~ 09 출발일 기준',d:'JTQ, JKQ 상품코드<br>3월 23일(월) 이후 체결'},
+    {subhdr:'🎲 랜덤 혜택 1개 + 공통 혜택'},
+    {cat:'공통혜택',cs:'common',p:'전 일정',b:'💧 전 일정 생수 제공 (수시 보충)',d:''},
+    {cat:'랜덤 1개',cs:'random',p:'견적 시 별도 협의',b:'• 🍽️ 석식 1회 노미호다이 제공<br>• 🍺 식사 시 생맥주 제공 (미성년자 대체 음료 제공)<br>• 🎁 일정 조건 충족 시 1FOC 제공<br>• 🚌 전 일정 또는 조건부 대형버스 제공<br>• 🚪 석식 단독룸 제공<br>• 🍱 Day당 간식 1회 제공<br>• 🛏️ 일정 조건 충족 시 싱글룸 무료 제공<br>• 💱 환율 고정 조건 제공<br><span style="font-size:11px;color:#9ca3af">※ 랜덤 추가 혜택 견적 단계에서 별도로 문의하세요</span>',d:''},
+  ]},]},
+'일본(김해/대구/제주)':{c:'red',s:[
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'💧 매일 생수 1병',d:'지방출발상품팀 담당 단체<br>(대마도 및 가이드 미동반 상품 제외)'},
+  ]},
+]},
+'중국(인천/청주)':{c:'teal',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍷 석식 1회 전통주 1병 (테이블당)',d:'중국상품 1팀/2팀/3팀 담당 인센티브 단체<br>중국 본토 행사 단체 대상'},
+    {cat:'⛳골프',cs:'golf',p:'⛳ 8명 이상',b:'🥃 고량주 1병 (테이블당)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'중국(지방출발)':{c:'teal',s:[
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'서안',cs:'special',p:'8명 이상',b:'🍽️ 석식 1회 🚪 단독룸 업그레이드<br>• 테이블당 🍷 서봉주 1병',d:'지방출발상품팀 담당 단체'},
+    {cat:'태항산',cs:'special',p:'8명 이상',b:'🍷 석식 1회 전통주 1병 (테이블당)',d:'지방출발상품팀 담당 단체'},
+    {cat:'황산',cs:'special',p:'15명 이상',b:'🍽️ 석식 1회 🍺 맥주 무제한, 🎤 노래방기기',d:'지방출발상품팀 담당 단체'},
+    {cat:'상해',cs:'special',p:'10명 이상',b:'🍽️ 석식 1회<br>• 테이블당 🥃 고량주 1병',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'몽골':{c:'teal',s:[
+  {t:'🛫 김해/대구 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍽️ 석식 1회 테이블당 🥃 보드카 1병<br>또는 🍺 인당 맥주 1캔 (선택 제공)',d:'지방출발상품팀 담당 단체'},
+    {cat:'내몽골(오르도스)',cs:'special',p:'10명 이상 단체',b:'👟 신발커버, 🧻 휴지+물티슈, 🍉 수박쥬스<br>🍽️ 석식1회 다양한 서비스 제공<br>🍷 전통주 1병 (450ml)<br>🍺 캔맥주 10캔<br>🍎 식후 과일 제공 (10인 기준 테이블당)',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'중앙아시아':{c:'teal',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍽️ 석식 1회 🥃 보드카 1병 (테이블당)',d:'중국상품팀 담당 단체'},
+  ]},
+]},
+'홍콩마카오':{c:'teal',s:[
+  {t:'🛫 김해/대구/제주 출발',r:[
+    {cat:'전 지역',cs:'general',p:'15명 이상',b:'🍽️ 석식 1회 🚪 단독룸 업그레이드<br>🍺 테이블당 맥주 3병',d:'지방출발상품팀 담당 단체'},
+  ]},
+]},
+'괌':{c:'blue',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'20명 이상',b:'🌺 하파데이 세트 (객실당)',d:'남태평양상품팀 담당 단체'},
+  ]},
+  {t:'🛫 김해 출발',r:[
+    {cat:'전 지역',cs:'general',p:'최소 4명 부터',b:'💧 매일 생수 1개',d:'지방출발상품2팀 담당 단체'},
+  ]},
+]},
+'사이판':{c:'blue',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'20명 이상',b:'🍺 맥주버킷 (객실당)',d:'남태평양상품팀 담당 단체'},
+    {cat:'⛳골프',cs:'golf',p:'⛳ 10명 이상',b:'🍺 맥주패키지 (객실당)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'호주/뉴질랜드':{c:'blue',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'30명 이상',b:'🍽️ 만찬비 지원<br>• AUD 500 (30~39명)<br>• AUD 700 (40~49명)<br>• AUD 900 (50명~)',d:'남태평양상품팀 담당 단체'},
+  ]},
+]},
+'유럽/중동':{c:'orange',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'소규모 단체',cs:'basic',p:'최소 4명 부터',b:'해외 지역별 프로모션 동일 (단, 노래방기기 / 단독룸 제외)',d:'개별인센티브팀 담당 단체'},
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'💧 매일 생수 1개',d:'유럽상품팀 담당 단체'},
+  ]},
+]},
+'미주':{c:'orange',s:[
+  {t:'✈️ 인천/청주 출발 (미국/캐나다)',r:[
+    {cat:'10~20명',cs:'general',p:'10~20명',b:'🍷 와인 1병 (객실당)',d:'미주상품팀 담당 단체'},
+    {cat:'21~40명',cs:'general',p:'21~40명',b:'🍖 한식 업그레이드 BBQ & 🍺 맥주 1잔 1회',d:'미주상품팀 담당 단체'},
+    {cat:'41명~',cs:'special',p:'41명~',b:'💰 USD 1,000 만찬비 지원',d:'미주상품팀 담당 단체'},
+  ]},
+]},
+'하와이':{c:'orange',s:[
+  {t:'✈️ 인천/청주 출발',r:[
+    {cat:'10~30명',cs:'general',p:'10~30명',b:'🍷 와인 1병 (객실당)',d:'미주상품팀 담당 단체'},
+    {cat:'31명~',cs:'special',p:'31명~',b:'🍖 한식(점심) → 고기뷔페 1회 업그레이드',d:'미주상품팀 담당 단체'},
+  ]},
+]},
+'지중해/북유럽':{c:'navy',s:[
+  {t:'✈️ 전국 공항 출발',r:[
+    {cat:'전 지역',cs:'general',p:'14명 이상',b:'🚌 인천공항 교통비 지원<br>• 최대 100만원 공항이동 버스비 지원 (영수증 기준)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'알래스카':{c:'navy',s:[
+  {t:'✈️ 전국 공항 출발',r:[
+    {cat:'10명 이상',cs:'basic',p:'10명 이상',b:'🛂 미국 전자비자 비용 포함 (ESTA 비자 기준)',d:'골프/크루즈상품팀 담당 단체'},
+    {cat:'추가혜택',cs:'special',p:'16명 이상',b:'🚌 인천공항 교통비 지원<br>• 최대 100만원 공항이동 버스비 지원 (영수증 기준)',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'C싱가포르':{c:'navy',s:[
+  {t:'✈️ 전국 공항 출발',r:[
+    {cat:'전 지역',cs:'general',p:'14명 이상',b:'🍷 정찬식당 식사 시 인당 와인 1잔 제공',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'C상해':{c:'navy',s:[
+  {t:'✈️ 전국 공항 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍽️ 선내 유료레스토랑 식사 1회<br>🎭 상해 유료옵션 포함 (선택 1회)<br>- 마시청 서커스 OR 💆 전신마사지 2시간',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'C아시아':{c:'navy',s:[
+  {t:'✈️ 전국 공항 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍽️ 선내 유료레스토랑 식사 1회',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+'C일본':{c:'navy',s:[
+  {t:'🚢 부산항 출발',r:[
+    {cat:'전 지역',cs:'general',p:'10명 이상',b:'🍎 과일 접시 1회<br>🛏️ 캐빈 업그레이드 또는 추가할인',d:'골프/크루즈상품팀 담당 단체'},
+  ]},
+]},
+};
+
+
+
+
+let cC='동남아',cS='베트남';
+const defS={'동남아':'베트남','일본':'일본(인천/청주)','중국':'중국(인천/청주)','괌':'호주/뉴질랜드','유럽':'미주','크루즈':'C일본'};
+function gl(id){return lbs[id]||id;}
+function rCats(){
+  document.getElementById('ct').innerHTML=cats.map(c=>
+    `<button class="cat-btn${c.id===cC?' active':''}" onclick="sC('${c.id}')">${c.lb}</button>`
+  ).join('');
+}
+function rSubs(){
+  const cat=cats.find(c=>c.id===cC);
+  document.getElementById('sg').innerHTML=cat.subs.map(s=>{
+    const r=D[s],col=r?r.c:'gray',act=s===cS?' active':'';
+    return `<button class="sub-btn ${col}${act}" onclick="sS(this,'${s}')">${gl(s)}</button>`;
+  }).join('');
+}
+function rDetail(){
+  const p=document.getElementById('dp');
+  if(!cS||!D[cS]){p.className='panel';p.innerHTML='';tick();return;}
+  const r=D[cS],col=r.c;
+  let h=`<div class="p-title ${col}">📋 ${gl(cS)} 인센티브 혜택</div>`;
+  if(r.box){r.box.forEach(bx=>{
+    const ch=bx.chips.map(c=>`<span class="pc">${c}</span>`).join('');
+    const rw=bx.rows.map(x=>`<tr><td class="qt">${x[0]}</td><td class="amt">${x[1]}</td></tr>`).join('');
+    const nt=bx.note?`<div class="promo-note">※ ${bx.note}</div>`:'';
+    h+=`<div class="promo-box"><div class="promo-hd">${bx.t}<span class="sub">${bx.sub}</span></div><div class="promo-bd"><div class="promo-chips">${ch}</div><table class="promo-tb"><tbody>${rw}</tbody></table>${nt}</div></div>`;
+  });}
+  r.s.forEach(sec=>{
+    h+=`<div class="s-hdr ${col}">${sec.t}</div><table><thead><tr><th style="width:104px">구분</th><th style="width:130px">인원</th><th>혜택 내용</th><th style="width:148px">조건</th></tr></thead><tbody>`;
+    sec.r.forEach(row=>{
+      if(row.subhdr){
+        h+=`<tr><td colspan="4" class="sub-hdr-row">${row.subhdr}</td></tr>`;
+      } else {
+        h+=`<tr><td><span class="badge ${bcM[row.cs]||'b0'}">${row.cat}</span></td><td>${row.p}</td><td>${row.b}</td><td class="ctd">${row.d}</td></tr>`;
+      }
+    });
+    h+=`</tbody></table>`;
+  });
+  p.className='panel show';p.innerHTML=h;tick();
+}
+function sC(id){
+  cC=id;
+  
+  cS=defS[id]||null;rCats();rSubs();rDetail();
+}
+function sS(el,id){cS=cS===id?null:id;rSubs();rDetail();}
+function tick(){setTimeout(()=>parent.postMessage({type:'wrks:viz:resize',height:document.documentElement.scrollHeight},'*'),80);}
+rCats();rSubs();rDetail();
+window.addEventListener('load',tick);
+new ResizeObserver(tick).observe(document.body);
+</script>
+</body>
+</html>
